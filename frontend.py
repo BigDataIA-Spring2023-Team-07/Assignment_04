@@ -1,4 +1,4 @@
 import streamlit as st
 
-st.title("Model as a Service - Meeting Summary")
+st.title("Model as a Service - Meeting Summary :page_with_curl:")
 

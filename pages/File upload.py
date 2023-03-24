@@ -36,7 +36,7 @@ if st.button("Submit"):
 
 
 # Fetch files from S3 and store the filenames in a list
-st.header("Select a file from the list")
+st.header("Select a file from the list :three_button_mouse:")
 FAST_API_URL = "http://localhost:8000/getfilenames"
 response = requests.get(FAST_API_URL)
 file_list = response.json()['filenames']
@@ -49,18 +49,24 @@ st.write("You selected: ", file_selected)
 
 
 # Select the qn from dropdown list
-st.header("Select a question from the list")
-qn_selected = st.selectbox("Select a question", ["Can you summarize the meeting?", "What is the meeting about?", "How was the tone of the meeting?", "Question4", "Custom"])
+message_history = []
+st.header("Select a question from the list :grey_question:")
+qn_selected = st.selectbox("Select a question", ["Can you summarize ?", "What is the main topic?", "How was the tone?", "Any things whic needs to be done later?", "Custom"])
 
 if qn_selected == "Custom":
     qn_selected = st.text_input("Enter your question")
 
 st.write("Your Question: ", qn_selected)
+message_history.append({"role": "user", "content": f"{qn_selected}"})
 
 if st.button("Process"):
      with st.spinner("Processing your request"):
         FASTAPI_URL = "http://localhost:8000/getdefaultquestion"
-        response = requests.post(FASTAPI_URL, json={"question": qn_selected, "file_name": file_selected})
+        response = requests.post(FASTAPI_URL, json={"question": qn_selected, "file_name": file_selected, "message_history": message_history})
         reply = response.json()['reply']
-        st.write("Answer:", reply)
+        message_history = response.json()['message_history']
+        if len(reply) == 0:
+            st.write("No response from the model. Please try again")
+        else:
+            st.write("Answer:", reply)
 

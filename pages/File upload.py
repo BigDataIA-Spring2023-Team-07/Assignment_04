@@ -52,12 +52,15 @@ st.write("You selected: ", file_selected)
 st.header("Select a question from the list")
 qn_selected = st.selectbox("Select a question", ["Can you summarize the meeting?", "What is the meeting about?", "How was the tone of the meeting?", "Question4", "Custom"])
 
-# if qn_selected == "Custom":
-#     qn_selected = st.text_input("Enter your question")
+if qn_selected == "Custom":
+    qn_selected = st.text_input("Enter your question")
 
 st.write("Your Question: ", qn_selected)
 
 if st.button("Process"):
-     FASTAPI_URL = "http://localhost:8000/getdefaultquestion"
-     response = requests.post(FASTAPI_URL, json={"question": qn_selected, "file_name": file_selected})
+     with st.spinner("Processing your request"):
+        FASTAPI_URL = "http://localhost:8000/getdefaultquestion"
+        response = requests.post(FASTAPI_URL, json={"question": qn_selected, "file_name": file_selected})
+        reply = response.json()['reply']
+        st.write("Answer:", reply)
 

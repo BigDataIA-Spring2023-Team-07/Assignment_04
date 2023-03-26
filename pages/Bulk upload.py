@@ -2,6 +2,10 @@ import streamlit as st
 import boto3
 import os
 from dotenv import load_dotenv
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from backend import common_utils
 
 load_dotenv()
 
@@ -26,7 +30,8 @@ if st.button("Submit"):
             s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY1'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY1'))
             with st.spinner("Uploading file to S3"):
                 for audio_file in uploaded_files:
-                    s3client.put_object(Bucket='damg7245-team7', Key= 'Batch/' + audio_file.name , Body=audio_file.read())
+                    # s3client.put_object(Bucket='damg7245-team7', Key= 'Batch/' + audio_file.name , Body=audio_file.read())
+                    common_utils.uploadfile(audio_file.name, audio_file.read())
             st.success("File uploaded to S3 successfully")
 
 

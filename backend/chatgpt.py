@@ -2,19 +2,10 @@ import boto3
 import os
 import openai
 from dotenv import load_dotenv
+import tiktoken
+from backend import common_utils
 
 load_dotenv()
-
-
-
-def create_connection():
-    """Create a connection to S3 bucket
-    Returns:
-        s3client: S3 client object
-    """
-    s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY1'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY1'))
-    return s3client
-
 
 def chat(inp, message_history, role="user"):
 
@@ -33,15 +24,15 @@ def chat(inp, message_history, role="user"):
     # Append the generated response to the message history
     message_history.append({"role": "assistant", "content": f"{reply_content}"})
 
-    # Return the generated response and the updated message history
-    return reply_content, message_history
+    # Return the generated response
+    return reply_content
 
 
 
 def getdefaultquestion(question, selected_file, message_history):
 
     file_list = []
-    s3client = create_connection()
+    s3client = common_utils.create_connection()
     bucket = 'damg7245-team7'
     prefix = 'Processed Text/'
 
@@ -57,29 +48,33 @@ def getdefaultquestion(question, selected_file, message_history):
 
 
 
+
     if selected_file in file_list:
         # Fetch transcript from S3
         bucket_name = 'damg7245-team7'
         file_path = 'Processed Text/' + selected_file + '.txt'
-
         # Fetch the file content from S3
         response = s3client.get_object(Bucket=bucket_name, Key=file_path)
 
         # Read the contents of the file
         file_content = response['Body'].read().decode('utf-8')
 
+
         # Provide the content to chatgpt api
         openai.api_key = os.environ.get('OPENAI_API_KEY')
 
-        
-        reply, message_history = chat(file_content + question + "?", message_history)
+       
+
+    
+
+        reply = chat(file_content + question + "?", message_history)
         return reply, message_history
     
 
 def getfilenames():
 
     file_list = []
-    s3client = create_connection()
+    s3client = common_utils.create_connection()
     bucket = 'damg7245-team7'
     prefix1 = 'Adhoc/'
     prefix2 = 'Batch/'
@@ -105,9 +100,24 @@ def getfilenames():
 
     return file_list
 
+def count_tokens(text):
+    encoding = tiktoken.get_encoding("gpt2")
+    input_ids = encoding.encode(text)
+    num_tokens = len(input_ids)
+    return num_tokens
 
-def uploadfile(file_name, file_content):
+def break_up_file_to_chunks(filename, chunk_size=2000, overlap=100):
 
-    s3client = create_connection()
-    s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + file_name , Body= file_content)
+    encoding = tiktoken.get_encoding("gpt2")
+    with open(filename, 'r') as f:
+        text = f.read()
 
+    tokens = encoding.encode(text)
+    num_tokens = len(tokens)
+    
+    chunks = []
+    for i in range(0, num_tokens, chunk_size - overlap):
+        chunk = tokens[i:i + chunk_size]
+        chunks.append(chunk)
+    
+    return chunks

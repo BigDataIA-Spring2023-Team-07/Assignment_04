@@ -5,6 +5,10 @@ import boto3
 import os
 from dotenv import load_dotenv
 import numpy as np
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from backend import common_utils, chatgpt
 
 load_dotenv()
 
@@ -29,7 +33,8 @@ if st.button("Submit"):
         st.write("File size: ", audio_file.size/1048576 , "MB")
         s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY1'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY1'))
         with st.spinner("Uploading file to S3"):
-            s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + audio_file.name , Body=audio_file.read())
+            # s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + audio_file.name , Body=audio_file.read())
+            common_utils.uploadfile(audio_file.name, audio_file.read())
             st.success("File uploaded to S3 successfully")
 
 
@@ -37,9 +42,8 @@ if st.button("Submit"):
 
 # Fetch files from S3 and store the filenames in a list
 st.header("Select a file from the list :three_button_mouse:")
-FAST_API_URL = "http://localhost:8000/getfilenames"
-response = requests.get(FAST_API_URL)
-file_list = response.json()['filenames']
+
+file_list = chatgpt.getfilenames()
 
 # Display the list of files in a dropdown
 file_selected = st.selectbox("Select a file", np.unique(file_list))
@@ -61,10 +65,7 @@ message_history.append({"role": "user", "content": f"{qn_selected}"})
 
 if st.button("Process"):
      with st.spinner("Processing your request"):
-        FASTAPI_URL = "http://localhost:8000/getdefaultquestion"
-        response = requests.post(FASTAPI_URL, json={"question": qn_selected, "file_name": file_selected, "message_history": message_history})
-        reply = response.json()['reply']
-        message_history = response.json()['message_history']
+        reply, message_history = chatgpt.getdefaultquestion(qn_selected, file_selected, message_history)
         if len(reply) == 0:
             st.write("No response from the model. Please try again")
         else:

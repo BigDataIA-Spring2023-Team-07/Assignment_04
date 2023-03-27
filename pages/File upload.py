@@ -15,7 +15,7 @@ st.title("Model as a Service - Meeting Summary :page_with_curl:")
 
 st.header("Please upload the audio file :mega:")
 
-audio_file = st.file_uploader("Upload audio file", type=['mp4', 'mp3'])
+audio_file = st.file_uploader("Upload audio file", type=['mp4', 'mp3', 'wav'])
 
 
 if st.button("Submit"):
@@ -24,11 +24,13 @@ if st.button("Submit"):
     
     
     # check if the file is mp4
-    elif (audio_file.name[-4:] != ".mp4") and (audio_file.name[-4:] != ".mp3"):
+    elif (audio_file.name[-4:] != ".mp4") and (audio_file.name[-4:] != ".mp3") and (audio_file.name[-4:] != ".wav"):
             st.error("Please upload the audio file in mp4 format")  
     else:
         st.write("File name: ", audio_file.name)
         st.write("File size: ", audio_file.size/1048576 , "MB")
+        if audio_file.size/1048576 > 25:
+            st.error("File size should be less than 25MB")
         s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY1'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY1'))
         with st.spinner("Uploading file to S3"):
             # s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + audio_file.name , Body=audio_file.read())

@@ -13,7 +13,7 @@ load_dotenv()
 st.title("Model as a Service - Meeting Summary :page_with_curl:")
 
 # Mutiple file upload
-uploaded_files = st.file_uploader("Upload audio files", type=['mp4', 'mp3'], accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload audio files", type=['mp4', 'mp3', 'wav'], accept_multiple_files=True)
 
 if st.button("Submit"):
     if uploaded_files is None:
@@ -21,8 +21,10 @@ if st.button("Submit"):
 
     for uploaded_file in uploaded_files:
         # check if the file is mp4 or mp3
-        if uploaded_file.name[-4:] != ".mp4" and uploaded_file.name[-4:] != ".mp3":
+        if uploaded_file.name[-4:] != ".mp4" and uploaded_file.name[-4:] != ".mp3" and uploaded_file.name[-4:] != ".wav"
             st.error("Please upload the audio file in mp4 format")  
+        elif uploaded_file.size/1048576 > 25:
+            st.error("File size should be less than 25MB")
 
         else:
             st.write("File name: ", uploaded_file.name)

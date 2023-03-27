@@ -1,5 +1,3 @@
-import base64
-import requests
 import streamlit as st
 import boto3
 import os
@@ -55,7 +53,7 @@ st.write("You selected: ", file_selected)
 # Select the qn from dropdown list
 message_history = []
 st.header("Select a question from the list :grey_question:")
-qn_selected = st.selectbox("Select a question", ["Can you summarize ?", "What is the main topic?", "How was the tone?", "Any things whic needs to be done later?", "Custom"])
+qn_selected = st.selectbox("Select a question", ["Can you summarize ?", "What is the main topic?", "How was the tone?", "Any things which needs to be done later?", "Custom"])
 
 if qn_selected == "Custom":
     qn_selected = st.text_input("Enter your question")
@@ -65,7 +63,7 @@ message_history.append({"role": "user", "content": f"{qn_selected}"})
 
 if st.button("Process"):
      with st.spinner("Processing your request"):
-        reply, message_history = chatgpt.getdefaultquestion(qn_selected, file_selected, message_history)
+        reply = chatgpt.getdefaultquestion(qn_selected, file_selected, message_history)
         if len(reply) == 0:
             st.write("No response from the model. Please try again")
         else:

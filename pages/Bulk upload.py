@@ -21,7 +21,7 @@ if st.button("Submit"):
 
     for uploaded_file in uploaded_files:
         # check if the file is mp4 or mp3
-        if uploaded_file.name[-4:] != ".mp4" and uploaded_file.name[-4:] != ".mp3" and uploaded_file.name[-4:] != ".wav"
+        if uploaded_file.name[-4:] != ".mp4" and uploaded_file.name[-4:] != ".mp3" and uploaded_file.name[-4:] != ".wav":
             st.error("Please upload the audio file in mp4 format")  
         elif uploaded_file.size/1048576 > 25:
             st.error("File size should be less than 25MB")

@@ -37,6 +37,13 @@ if st.button("Submit"):
             common_utils.uploadfile(audio_file.name, audio_file.read())
             st.success("File uploaded to S3 successfully")
 
+            # triggering the DAG
+            response = common_utils.trigger_dag(audio_file.name)
+            if response.status_code == 200:
+                st.success('DAG triggered successfully')
+            else:
+                st.error(f'Error triggering DAG: {response.text}')
+
 
 
 

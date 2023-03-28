@@ -16,7 +16,7 @@ aws_access_key = Variable.get('AWS_ACCESS_KEY')
 aws_secret_key = Variable.get('AWS_SECRET_KEY')
 openai.api_key = Variable.get('OPENAI_API_KEY')
 s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
-bucket_name = os.environ.get('bucket_name')
+bucket_name = Variable.get('bucket_name')
 
 
 default_args = {

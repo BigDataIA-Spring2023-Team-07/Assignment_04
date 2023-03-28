@@ -15,13 +15,13 @@ st.title("Model as a Service - Meeting Summary :page_with_curl:")
 
 st.header("Please upload the audio file :mega:")
 
-audio_file = st.file_uploader("Upload audio file", type=['mp4', 'mp3', 'wav'])
+audio_file = st.file_uploader("Upload audio file (Limit 25Mb)", type=['mp4', 'mp3', 'wav'])
 
+language = st.selectbox('Audio Language:', ['English', 'Otherss'])
 
 if st.button("Submit"):
     if audio_file is None:
         st.error("Please upload the audio file")
-    
     
     # check if the file is mp4
     elif (audio_file.name[-4:] != ".mp4") and (audio_file.name[-4:] != ".mp3") and (audio_file.name[-4:] != ".wav"):
@@ -29,16 +29,18 @@ if st.button("Submit"):
     else:
         st.write("File name: ", audio_file.name)
         st.write("File size: ", audio_file.size/1048576 , "MB")
+        st.write("Audio Language: ", language)
         if audio_file.size/1048576 > 25:
             st.error("File size should be less than 25MB")
-        s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY1'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY1'))
+        s3client = boto3.client('s3', region_name= "us-east-1", aws_access_key_id=os.environ.get('AWS_ACCESS_KEY'), aws_secret_access_key=os.environ.get('AWS_SECRET_KEY'))
         with st.spinner("Uploading file to S3"):
             # s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + audio_file.name , Body=audio_file.read())
-            common_utils.uploadfile(audio_file.name, audio_file.read())
+            audio_file_name= audio_file.name[:-4] + '_' + language + audio_file.name[-4:]
+            common_utils.uploadfile(audio_file_name, audio_file.read())
             st.success("File uploaded to S3 successfully")
 
             # triggering the DAG
-            response = common_utils.trigger_dag(audio_file.name)
+            response = common_utils.trigger_dag(audio_file_name)
             if response.status_code == 200:
                 st.success('DAG triggered successfully')
             else:

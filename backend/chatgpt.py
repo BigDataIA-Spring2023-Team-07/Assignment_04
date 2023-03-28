@@ -17,7 +17,7 @@ def getfilenames():
 
     file_list = []
     s3client = common_utils.create_connection()
-    bucket = 'damg7245-team7'
+    bucket = os.environ.get('bucket_name')
     prefix1 = 'Adhoc/'
     prefix2 = 'Batch/'
 
@@ -93,7 +93,7 @@ def getdefaultquestion(question, selected_file, message_history):
 
     file_list = []
     s3client = common_utils.create_connection()
-    bucket = 'damg7245-team7'
+    bucket = os.environ.get('bucket_name')
     prefix = 'Processed Text/'
 
 
@@ -106,12 +106,9 @@ def getdefaultquestion(question, selected_file, message_history):
 
     file_list = [val.split(".")[0] for val in file_list]
 
-
-
-
     if selected_file in file_list:
         # Fetch transcript from S3
-        bucket_name = 'damg7245-team7'
+        bucket_name = os.environ.get('bucket_name')
         file_path = 'Processed Text/' + selected_file + '.txt'
         # Fetch the file content from S3
         response = s3client.get_object(Bucket=bucket_name, Key=file_path)

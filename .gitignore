@@ -1,5 +1,11 @@
 proj_4/
 .env
+
 API/__pycache__
 __pycache__
 
+.env
+bigdog.wav
+venv_a4
+.DS_Store
+backend/whisper.py

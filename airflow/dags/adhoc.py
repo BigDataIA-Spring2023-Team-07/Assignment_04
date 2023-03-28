@@ -9,12 +9,14 @@ import openai
 import boto3
 import io
 from pydub import AudioSegment
+from pathlib import Path
+import os
 
 aws_access_key = Variable.get('AWS_ACCESS_KEY')
 aws_secret_key = Variable.get('AWS_SECRET_KEY')
 openai.api_key = Variable.get('OPENAI_API_KEY')
 s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
-bucket_name = 'damg7245-team7'
+bucket_name = os.environ.get('bucket_name')
 
 
 default_args = {
@@ -39,15 +41,14 @@ def read_audio(**context):
 # Task 2: sends the audio file to Whisper API for transcription
 def transcribe_audio(**context):
     audio_file_path = context['task_instance'].xcom_pull(task_ids='read_audio', key='file_path')
+    
+    filename=Path(audio_file_path).name
 
-    # print(audio_file_path)
-    #print(input_data)
     input_data = open(audio_file_path,'rb')
-    # Use the openai.Audio.transcribe() function to transcribe the audio file
-    transcription = openai.Audio.transcribe(model="whisper-1", file=input_data, response_format='text')
-
-    # Print the transcription to the console
-    # print(transcription)
+    if filename[-11:-4]=='English':
+        transcription = openai.Audio.transcribe(model="whisper-1", file=input_data, response_format='text')
+    elif filename[-11:-4]=='Otherss':
+        transcription = openai.Audio.translate(model="whisper-1", file=input_data, response_format='text')
 
     context['task_instance'].xcom_push(key='transcription', value=transcription)
 

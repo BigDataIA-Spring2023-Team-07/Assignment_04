@@ -17,7 +17,7 @@ st.header("Please upload the audio file :mega:")
 
 audio_file = st.file_uploader("Upload audio file (Limit 25Mb)", type=['mp4', 'mp3', 'wav'])
 
-language = st.selectbox('Audio Language:', ['English', 'Otherss'])
+language = st.selectbox('Audio Language:', ['English', 'Others'])
 
 if st.button("Submit"):
     if audio_file is None:

@@ -9,6 +9,7 @@ import openai
 import boto3
 import io
 from pydub import AudioSegment
+import json
 from pathlib import Path
 import os
 
@@ -185,6 +186,33 @@ def chat(inp, message_history, role="user"):
     # Return the generated response
     return reply_content, message_history
 
+def save_message_history(message_history,filename):
+    final_json = {}
+    my_json = {}
+    my_list=[]
+
+    aws_access_key_id = aws_access_key
+    aws_secret_access_key = aws_secret_key
+
+    for message_id, message in enumerate(message_history):
+        if message['role']=='user':
+            my_json["Question"] = str(message['content'].split('\n')[1])
+            my_json["Answer"] = message_history[message_id+1]['content']
+            my_json["Type"] = 'Default'
+            my_list.append(my_json)
+            my_json={}
+
+    final_json['message_history'] = my_list
+    json_string = json.dumps(final_json)
+
+    json_file_name = filename.split('.')[0] + '.json'
+
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+    bucket_name = 'damg7245-assignment-1'
+    folder_name = 'Message_History'
+
+    s3.put_object(Bucket=bucket_name, Key=f'{folder_name}/{json_file_name}', Body=json_string)
+
 def getdefaultquestion(question, transcript, message_history):
 
     """
@@ -250,6 +278,10 @@ def process_transcript(**context):
     # # Grab just the text from the API completion response
     # reply_content = completion.choices[0].message.content
 
+
+    #Save message history to S3
+    filename = context["dag_run"].conf["filename"]
+    save_message_history(message_history,filename)
 
     # Push the generated response
     context['task_instance'].xcom_push(key='transcript', value=transcript)

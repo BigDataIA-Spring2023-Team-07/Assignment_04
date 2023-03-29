@@ -15,7 +15,6 @@ import os
 aws_access_key = Variable.get('AWS_ACCESS_KEY')
 aws_secret_key = Variable.get('AWS_SECRET_KEY')
 openai.api_key = Variable.get('OPENAI_API_KEY')
-s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
 bucket_name = Variable.get('bucket_name')
 
 
@@ -26,10 +25,17 @@ default_args = {
     'retries': 1
 }
 
+def create_connection():
+    """Create a connection to S3 bucket
+    Returns:
+        s3: S3 client object
+    """
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
+    return s3
+
 # Task 1: reads an audio file from S3
 def read_audio(**context):
-    # s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
-    # bucket_name = 'damg7245-assignment-1'
+    s3 = create_connection()
     filename = context["dag_run"].conf["filename"]
     file_key = 'Adhoc/' + filename
     file = '/opt/airflow/working_dir/data/'+filename
@@ -47,17 +53,18 @@ def transcribe_audio(**context):
     input_data = open(audio_file_path,'rb')
     if filename[-11:-4]=='English':
         transcription = openai.Audio.transcribe(model="whisper-1", file=input_data, response_format='text')
-    elif filename[-11:-4]=='Otherss':
+    elif filename[-11:-4]=='Others':
         transcription = openai.Audio.translate(model="whisper-1", file=input_data, response_format='text')
 
     context['task_instance'].xcom_push(key='transcription', value=transcription)
 
 # Task 3: saves the transcript as a text file in S3
 def save_transcript(**context):
+    s3 = create_connection()
     filename = context["dag_run"].conf["filename"]
     transcript = context['task_instance'].xcom_pull(task_ids='transcribe_audio', key='transcription')
     dot_pos = filename.rfind(".")
-    outputFile = filename[:dot_pos] + "_transcript.txt"
+    outputFile = filename[:dot_pos] + ".txt"
 
     with open(outputFile, "w") as f:
         f.write(transcript)
@@ -65,7 +72,7 @@ def save_transcript(**context):
    
     # Upload the string object to S3
     with open(outputFile, "rb") as f:
-        s3.upload_fileobj(f, bucket_name, 'Processed_Folder/'+outputFile)
+        s3.upload_fileobj(f, bucket_name, 'Processed Text/'+outputFile)
 
 def count_tokens(text):
 

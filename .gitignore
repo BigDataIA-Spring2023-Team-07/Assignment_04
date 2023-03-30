@@ -9,3 +9,4 @@ bigdog.wav
 venv_a4
 .DS_Store
 backend/whisper.py
+airflow/logs

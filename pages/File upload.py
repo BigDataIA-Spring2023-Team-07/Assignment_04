@@ -76,11 +76,36 @@ if st.button("Ask"):
         else:
             with st.spinner("Processing your request"):
                 reply = chatgpt.getdefaultquestion(custom_qn, file_selected, message_history)
-                print(reply)
                 if len(reply) == 0:
                     st.write("No response from the model. Please try again")
+            
                 else:
                     st.write("Answer:", reply)
+                    s3client = common_utils.create_connection()
+                    bucket = os.environ.get('bucket_name')
+                    prefix = 'Message_History/'
+                    response = s3client.list_objects_v2(Bucket=bucket, Prefix=prefix+file_selected+'.json')
+                    for obj in response['Contents']:
+                        file_obj = s3client.get_object(Bucket=bucket, Key=obj['Key'])
+                        file_content = file_obj['Body'].read().decode('utf-8')
+
+                        # Decode the JSON content
+                        data = json.loads(file_content)
+
+                        # Add a new item to the 'message_history' list
+                        new_item = {
+                            "Question": custom_qn,
+                            "Answer": reply,
+                            "Type": "Custom"
+                        }
+                        data['message_history'].append(new_item)
+
+                        # Encode the modified JSON content
+                        new_content = json.dumps(data).encode('utf-8')
+                        print(new_content)
+
+                        # Upload the modified file back to S3
+                        s3client.put_object(Bucket=bucket, Key= obj['Key'], Body=new_content)
     else:
         s3client = common_utils.create_connection()        
         response = s3client.get_object(Bucket=os.environ.get('bucket_name'), Key= 'Message_History/' + file_selected+'.json')

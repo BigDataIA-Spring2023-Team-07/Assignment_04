@@ -129,7 +129,7 @@ def getdefaultquestion(question, selected_file, message_history):
             reply, message_history = split_token_chat(file_content, question)
             return reply
         else:
-            reply, message_history = chat(file_content + question + "?", message_history)
+            reply = chat(file_content + question + "?", message_history)
             return reply
     
 

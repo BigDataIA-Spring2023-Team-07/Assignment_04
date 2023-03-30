@@ -54,7 +54,7 @@ if st.button("Submit"):
 st.header("Which file do you want to generate prompts for? :three_button_mouse:")
 
 file_list = chatgpt.getfilenames()
-
+custom_qn = ""
 # Display the list of files in a dropdown
 file_selected = st.selectbox("Select a File :",np.unique(file_list))
 st.write("You selected: ", file_selected)
@@ -64,21 +64,36 @@ qn_selected = st.selectbox("Select a question", ["Can you summarize?", "What is 
 
 st.write("You selected: ", qn_selected)
 if qn_selected == "Custom":
-    qn_selected = st.text_input("Enter your question")
+    custom_qn = st.text_input("Enter your question")
+
+message_history = []
+message_history.append({"role": "user", "content": f"{custom_qn}"})
 
 if st.button("Ask"):
-    s3client = common_utils.create_connection()        
-    response = s3client.get_object(Bucket=os.environ.get('bucket_name'), Key= 'Message_History/' + file_selected+'.json')
-    file_content = response['Body'].read().decode('utf-8')
-    message_hist = json.loads(file_content)
-
-    with st.spinner("Processing your request"):
-        reply=""
-        for message in message_hist['message_history']:
-            if message['Question'] == qn_selected:
-                reply = message['Answer']
-                break
-        if len(reply) == 0:
-            st.write("No response from the model. Please try again")
+    if qn_selected == "Custom":
+        if len(custom_qn) == 0:
+            st.error("Please enter a question")
         else:
-            st.write("Answer:", reply)
+            with st.spinner("Processing your request"):
+                reply = chatgpt.getdefaultquestion(custom_qn, file_selected, message_history)
+                print(reply)
+                if len(reply) == 0:
+                    st.write("No response from the model. Please try again")
+                else:
+                    st.write("Answer:", reply)
+    else:
+        s3client = common_utils.create_connection()        
+        response = s3client.get_object(Bucket=os.environ.get('bucket_name'), Key= 'Message_History/' + file_selected+'.json')
+        file_content = response['Body'].read().decode('utf-8')
+        message_hist = json.loads(file_content)
+
+        with st.spinner("Processing your request"):
+            reply=""
+            for message in message_hist['message_history']:
+                if message['Question'] == qn_selected:
+                    reply = message['Answer']
+                    break
+            if len(reply) == 0:
+                st.write("No response from the model. Please try again")
+            else:
+                st.write("Answer:", reply)

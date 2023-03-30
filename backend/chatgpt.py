@@ -91,6 +91,7 @@ def getdefaultquestion(question, selected_file, message_history):
         
     """
 
+
     file_list = []
     s3client = common_utils.create_connection()
     bucket = os.environ.get('bucket_name')
@@ -106,6 +107,8 @@ def getdefaultquestion(question, selected_file, message_history):
 
     file_list = [val.split(".")[0] for val in file_list]
 
+    print(selected_file, file_list)
+
     if selected_file in file_list:
         # Fetch transcript from S3
         bucket_name = os.environ.get('bucket_name')
@@ -119,6 +122,7 @@ def getdefaultquestion(question, selected_file, message_history):
 
         # Provide the content to chatgpt api
         openai.api_key = os.environ.get('OPENAI_API_KEY')
+
 
         num_tokens = count_tokens(file_content)
         if num_tokens > 2000:

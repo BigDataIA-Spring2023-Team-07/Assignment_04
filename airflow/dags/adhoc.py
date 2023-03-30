@@ -40,7 +40,7 @@ def read_audio(**context):
     s3 = create_connection()
     filename = context["dag_run"].conf["filename"]
     file_key = 'Adhoc/' + filename
-    file = '/opt/airflow/working_dir/data/'+filename
+    file = '/opt/airflow/working_dir/'+filename
 
     # Download audio file from S3
     s3.download_file(bucket_name, file_key, file)

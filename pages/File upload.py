@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from backend import common_utils, chatgpt
+import json
 
 load_dotenv()
 
@@ -17,7 +18,7 @@ st.header("Please upload the audio file :mega:")
 
 audio_file = st.file_uploader("Upload audio file (Limit 25Mb)", type=['mp4', 'mp3', 'wav'])
 
-language = st.selectbox('Audio Language:', ['English', 'Others'])
+language = st.selectbox('Audio Language:', ['English', 'Otherss'])
 
 if st.button("Submit"):
     if audio_file is None:
@@ -36,7 +37,7 @@ if st.button("Submit"):
         with st.spinner("Uploading file to S3"):
             # s3client.put_object(Bucket='damg7245-team7', Key= 'Adhoc/' + audio_file.name , Body=audio_file.read())
             audio_file_name= audio_file.name[:-4] + '_' + language + audio_file.name[-4:]
-            common_utils.uploadfile(audio_file_name, audio_file.read())
+            common_utils.uploadfile(audio_file_name, audio_file.read(),'Adhoc')
             st.success("File uploaded to S3 successfully")
 
             # triggering the DAG
@@ -50,33 +51,34 @@ if st.button("Submit"):
 
 
 # Fetch files from S3 and store the filenames in a list
-st.header("Select a file from the list :three_button_mouse:")
+st.header("Which file do you want to generate prompts for? :three_button_mouse:")
 
 file_list = chatgpt.getfilenames()
 
 # Display the list of files in a dropdown
-file_selected = st.selectbox("Select a file", np.unique(file_list))
+file_selected = st.selectbox("Select a File :",np.unique(file_list))
 st.write("You selected: ", file_selected)
-
-
-
-
-# Select the qn from dropdown list
-message_history = []
+            
 st.header("Select a question from the list :grey_question:")
-qn_selected = st.selectbox("Select a question", ["Can you summarize ?", "What is the main topic?", "How was the tone?", "Any things which needs to be done later?", "Custom"])
+qn_selected = st.selectbox("Select a question", ["Can you summarize?", "What is the main topic?", "How is the tone?", "Custom"])
 
+st.write("You selected: ", qn_selected)
 if qn_selected == "Custom":
     qn_selected = st.text_input("Enter your question")
 
-st.write("Your Question: ", qn_selected)
-message_history.append({"role": "user", "content": f"{qn_selected}"})
+if st.button("Ask"):
+    s3client = common_utils.create_connection()        
+    response = s3client.get_object(Bucket=os.environ.get('bucket_name'), Key= 'Message_History/' + file_selected+'.json')
+    file_content = response['Body'].read().decode('utf-8')
+    message_hist = json.loads(file_content)
 
-if st.button("Process"):
-     with st.spinner("Processing your request"):
-        reply = chatgpt.getdefaultquestion(qn_selected, file_selected, message_history)
+    with st.spinner("Processing your request"):
+        reply=""
+        for message in message_hist['message_history']:
+            if message['Question'] == qn_selected:
+                reply = message['Answer']
+                break
         if len(reply) == 0:
             st.write("No response from the model. Please try again")
         else:
             st.write("Answer:", reply)
-

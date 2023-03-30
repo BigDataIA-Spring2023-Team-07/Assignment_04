@@ -20,7 +20,7 @@ def create_connection():
 
 
 
-def uploadfile(file_name, file_content):
+def uploadfile(file_name, file_content,folder):
     
     """Upload file to S3 bucket
     Args:
@@ -29,7 +29,7 @@ def uploadfile(file_name, file_content):
     """
 
     s3client = create_connection()
-    s3client.put_object(Bucket=os.environ.get('bucket_name'), Key= 'Adhoc/' + file_name , Body= file_content)
+    s3client.put_object(Bucket=os.environ.get('bucket_name'), Key= folder +'/' + file_name , Body= file_content)
 
 
 def trigger_dag(filename):

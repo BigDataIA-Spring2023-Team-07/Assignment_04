@@ -12,6 +12,7 @@ from pydub import AudioSegment
 import json
 from pathlib import Path
 import os
+import logger
 
 aws_access_key = Variable.get('AWS_ACCESS_KEY')
 aws_secret_key = Variable.get('AWS_SECRET_KEY')
@@ -54,7 +55,7 @@ def transcribe_audio(**context):
     input_data = open(audio_file_path,'rb')
     if filename[-11:-4]=='English':
         transcription = openai.Audio.transcribe(model="whisper-1", file=input_data, response_format='text')
-    elif filename[-11:-4]=='Others':
+    elif filename[-11:-4]=='Otherss':
         transcription = openai.Audio.translate(model="whisper-1", file=input_data, response_format='text')
 
     context['task_instance'].xcom_push(key='transcription', value=transcription)
@@ -190,10 +191,7 @@ def save_message_history(message_history,filename):
     final_json = {}
     my_json = {}
     my_list=[]
-
-    aws_access_key_id = aws_access_key
-    aws_secret_access_key = aws_secret_key
-
+    
     for message_id, message in enumerate(message_history):
         if message['role']=='user':
             my_json["Question"] = str(message['content'].split('\n')[1])
@@ -207,10 +205,16 @@ def save_message_history(message_history,filename):
 
     json_file_name = filename.split('.')[0] + '.json'
 
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
-    bucket_name = 'damg7245-assignment-1'
+    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
     folder_name = 'Message_History'
 
+    # logger.info("11111111111")
+    # logger.info(bucket_name)
+    # logger.info(folder_name)
+    # logger.info(json_file_name)
+    # logger.info(json_string)
+    # logger.info("11111111111")
+    
     s3.put_object(Bucket=bucket_name, Key=f'{folder_name}/{json_file_name}', Body=json_string)
 
 def getdefaultquestion(question, transcript, message_history):
@@ -232,7 +236,7 @@ def getdefaultquestion(question, transcript, message_history):
         reply, message_history = split_token_chat(file_content, question)
         return reply, message_history
     else:
-        reply, message_history = chat(file_content + question + "?", message_history)
+        reply, message_history = chat(file_content + question, message_history)
         return reply, message_history
 
 
@@ -242,23 +246,17 @@ def process_transcript(**context):
     transcript = context['task_instance'].xcom_pull(task_ids='transcribe_audio', key='transcription')
     message_history = []
 
-    question = "Can you summarize the meeting for me?"
+    question = "Can you summarize?"
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
 
-    question = "What was the main topic discussed in the meeting?"
+    question = "What is the main topic?"
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
 
-    question = "How was the tone of the meeting?"
+    question = "How is the tone?"
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
-
-    question = "Are there any action items from the meeting that we need to follow up on?"
-    # message_history.append({"role": "user", "content": f"{question}"})
-    getdefaultquestion(question,transcript,message_history)
-
-
 
     # # Define the transcript and content of each question
     # message = [

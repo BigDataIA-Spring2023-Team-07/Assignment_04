@@ -1,0 +1,32 @@
+[2023-03-30T01:04:03.879+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: audio_processing_dag.transcribe_audio manual__2023-03-30T01:03:58.148708+00:00 [queued]>
+[2023-03-30T01:04:03.893+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: audio_processing_dag.transcribe_audio manual__2023-03-30T01:03:58.148708+00:00 [queued]>
+[2023-03-30T01:04:03.897+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-30T01:04:03.898+0000] {taskinstance.py:1283} INFO - Starting attempt 1 of 2
+[2023-03-30T01:04:03.899+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-30T01:04:03.909+0000] {taskinstance.py:1303} INFO - Executing <Task(PythonOperator): transcribe_audio> on 2023-03-30 01:03:58.148708+00:00
+[2023-03-30T01:04:03.917+0000] {standard_task_runner.py:55} INFO - Started process 695 to run task
+[2023-03-30T01:04:03.922+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'audio_processing_dag', 'transcribe_audio', 'manual__2023-03-30T01:03:58.148708+00:00', '--job-id', '80', '--raw', '--subdir', 'DAGS_FOLDER/adhoc.py', '--cfg-path', '/tmp/tmp0a0q09kb']
+[2023-03-30T01:04:03.924+0000] {standard_task_runner.py:83} INFO - Job 80: Subtask transcribe_audio
+[2023-03-30T01:04:03.994+0000] {task_command.py:388} INFO - Running <TaskInstance: audio_processing_dag.transcribe_audio manual__2023-03-30T01:03:58.148708+00:00 [running]> on host 1ae242592484
+[2023-03-30T01:04:04.092+0000] {taskinstance.py:1509} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=audio_processing_dag
+AIRFLOW_CTX_TASK_ID=transcribe_audio
+AIRFLOW_CTX_EXECUTION_DATE=2023-03-30T01:03:58.148708+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2023-03-30T01:03:58.148708+00:00
+[2023-03-30T01:04:04.108+0000] {taskinstance.py:1775} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 175, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 192, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/adhoc.py", line 61, in transcribe_audio
+    context['task_instance'].xcom_push(key='transcription', value=transcription)
+UnboundLocalError: local variable 'transcription' referenced before assignment
+[2023-03-30T01:04:04.118+0000] {taskinstance.py:1321} INFO - Marking task as UP_FOR_RETRY. dag_id=audio_processing_dag, task_id=transcribe_audio, execution_date=20230330T010358, start_date=20230330T010403, end_date=20230330T010404
+[2023-03-30T01:04:04.132+0000] {standard_task_runner.py:100} ERROR - Failed to execute job 80 for task transcribe_audio (local variable 'transcription' referenced before assignment; 695)
+[2023-03-30T01:04:04.175+0000] {local_task_job.py:212} INFO - Task exited with return code 1
+[2023-03-30T01:04:04.192+0000] {taskinstance.py:2585} INFO - 0 downstream tasks scheduled from follow-on schedule check

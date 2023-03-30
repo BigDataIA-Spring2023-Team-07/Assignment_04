@@ -1,0 +1,23 @@
+[2023-03-30T00:48:11.301+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: audio_processing_dag.read_audio manual__2023-03-30T00:48:09.612619+00:00 [queued]>
+[2023-03-30T00:48:11.306+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: audio_processing_dag.read_audio manual__2023-03-30T00:48:09.612619+00:00 [queued]>
+[2023-03-30T00:48:11.307+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-30T00:48:11.308+0000] {taskinstance.py:1283} INFO - Starting attempt 1 of 2
+[2023-03-30T00:48:11.308+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-30T00:48:11.314+0000] {taskinstance.py:1303} INFO - Executing <Task(PythonOperator): read_audio> on 2023-03-30 00:48:09.612619+00:00
+[2023-03-30T00:48:11.319+0000] {standard_task_runner.py:55} INFO - Started process 182 to run task
+[2023-03-30T00:48:11.322+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'audio_processing_dag', 'read_audio', 'manual__2023-03-30T00:48:09.612619+00:00', '--job-id', '67', '--raw', '--subdir', 'DAGS_FOLDER/adhoc.py', '--cfg-path', '/tmp/tmp0j4i2n0z']
+[2023-03-30T00:48:11.325+0000] {standard_task_runner.py:83} INFO - Job 67: Subtask read_audio
+[2023-03-30T00:48:11.374+0000] {task_command.py:388} INFO - Running <TaskInstance: audio_processing_dag.read_audio manual__2023-03-30T00:48:09.612619+00:00 [running]> on host 1ae242592484
+[2023-03-30T00:48:11.427+0000] {taskinstance.py:1509} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=audio_processing_dag
+AIRFLOW_CTX_TASK_ID=read_audio
+AIRFLOW_CTX_EXECUTION_DATE=2023-03-30T00:48:09.612619+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2023-03-30T00:48:09.612619+00:00
+[2023-03-30T00:48:11.960+0000] {python.py:177} INFO - Done. Returned value was: None
+[2023-03-30T00:48:11.972+0000] {taskinstance.py:1321} INFO - Marking task as SUCCESS. dag_id=audio_processing_dag, task_id=read_audio, execution_date=20230330T004809, start_date=20230330T004811, end_date=20230330T004811
+[2023-03-30T00:48:12.024+0000] {local_task_job.py:212} INFO - Task exited with return code 0
+[2023-03-30T00:48:12.047+0000] {taskinstance.py:2585} INFO - 1 downstream tasks scheduled from follow-on schedule check

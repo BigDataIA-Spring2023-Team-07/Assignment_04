@@ -33,7 +33,9 @@ if st.button("Submit"):
             with st.spinner("Uploading file to S3"):
                 for audio_file in uploaded_files:
                     # s3client.put_object(Bucket='damg7245-team7', Key= 'Batch/' + audio_file.name , Body=audio_file.read())
-                    common_utils.uploadfile(audio_file.name, audio_file.read())
+                    common_utils.uploadfile(audio_file.name, audio_file.read(),'Batch')
+                    st.write("File name: ", uploaded_file.name)
+                    st.write("File size: ", uploaded_file.size/1048576 , "MB")
             st.success("File uploaded to S3 successfully")
 
 

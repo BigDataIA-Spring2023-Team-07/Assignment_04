@@ -1,0 +1,52 @@
+[2023-03-29T23:00:13.559+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: audio_processing_dag.read_audio manual__2023-03-29T22:59:52.018866+00:00 [queued]>
+[2023-03-29T23:00:13.564+0000] {taskinstance.py:1084} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: audio_processing_dag.read_audio manual__2023-03-29T22:59:52.018866+00:00 [queued]>
+[2023-03-29T23:00:13.564+0000] {taskinstance.py:1282} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-29T23:00:13.565+0000] {taskinstance.py:1283} INFO - Starting attempt 1 of 2
+[2023-03-29T23:00:13.565+0000] {taskinstance.py:1284} INFO - 
+--------------------------------------------------------------------------------
+[2023-03-29T23:00:13.571+0000] {taskinstance.py:1303} INFO - Executing <Task(PythonOperator): read_audio> on 2023-03-29 22:59:52.018866+00:00
+[2023-03-29T23:00:13.576+0000] {standard_task_runner.py:55} INFO - Started process 143 to run task
+[2023-03-29T23:00:13.579+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'audio_processing_dag', 'read_audio', 'manual__2023-03-29T22:59:52.018866+00:00', '--job-id', '9', '--raw', '--subdir', 'DAGS_FOLDER/adhoc.py', '--cfg-path', '/tmp/tmplo1fjc71']
+[2023-03-29T23:00:13.581+0000] {standard_task_runner.py:83} INFO - Job 9: Subtask read_audio
+[2023-03-29T23:00:13.631+0000] {task_command.py:388} INFO - Running <TaskInstance: audio_processing_dag.read_audio manual__2023-03-29T22:59:52.018866+00:00 [running]> on host 8a091de33e52
+[2023-03-29T23:00:13.672+0000] {taskinstance.py:1509} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=audio_processing_dag
+AIRFLOW_CTX_TASK_ID=read_audio
+AIRFLOW_CTX_EXECUTION_DATE=2023-03-29T22:59:52.018866+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2023-03-29T22:59:52.018866+00:00
+[2023-03-29T23:00:14.269+0000] {taskinstance.py:1775} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 175, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 192, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/adhoc.py", line 45, in read_audio
+    s3.download_file(bucket_name, file_key, file)
+  File "/home/airflow/.local/lib/python3.8/site-packages/boto3/s3/inject.py", line 190, in download_file
+    return transfer.download_file(
+  File "/home/airflow/.local/lib/python3.8/site-packages/boto3/s3/transfer.py", line 326, in download_file
+    future.result()
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/futures.py", line 103, in result
+    return self._coordinator.result()
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/futures.py", line 266, in result
+    raise self._exception
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/tasks.py", line 139, in __call__
+    return self._execute_main(kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/tasks.py", line 162, in _execute_main
+    return_value = self._main(**kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/download.py", line 642, in _main
+    fileobj.seek(offset)
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/utils.py", line 378, in seek
+    self._open_if_needed()
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/utils.py", line 361, in _open_if_needed
+    self._fileobj = self._open_function(self._filename, self._mode)
+  File "/home/airflow/.local/lib/python3.8/site-packages/s3transfer/utils.py", line 272, in open
+    return open(filename, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/working_dir/data/bigdog_English.wav.4928aF13'
+[2023-03-29T23:00:14.289+0000] {taskinstance.py:1321} INFO - Marking task as UP_FOR_RETRY. dag_id=audio_processing_dag, task_id=read_audio, execution_date=20230329T225952, start_date=20230329T230013, end_date=20230329T230014
+[2023-03-29T23:00:14.304+0000] {standard_task_runner.py:100} ERROR - Failed to execute job 9 for task read_audio ([Errno 2] No such file or directory: '/opt/airflow/working_dir/data/bigdog_English.wav.4928aF13'; 143)
+[2023-03-29T23:00:14.338+0000] {local_task_job.py:212} INFO - Task exited with return code 1
+[2023-03-29T23:00:14.356+0000] {taskinstance.py:2585} INFO - 0 downstream tasks scheduled from follow-on schedule check

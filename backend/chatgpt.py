@@ -107,7 +107,7 @@ def getdefaultquestion(question, selected_file, message_history):
 
     file_list = [val.split(".")[0] for val in file_list]
 
-    print(selected_file, file_list)
+    # print(selected_file, file_list)
 
     if selected_file in file_list:
         # Fetch transcript from S3
@@ -159,7 +159,7 @@ def chat(inp, message_history, role="user"):
     # Append the generated response to the message history
     message_history.append({"role": "assistant", "content": f"{reply_content}"})
 
-    # Return the generated response
+    # Return the generated response.
     return reply_content
 
 def split_token_chat(text, question):

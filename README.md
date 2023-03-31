@@ -1,6 +1,8 @@
-# VaniVerse - Transcripting voice to a world of words
+<img src="logo.png" width=200>
 
-[Application link]()
+# VaniVerse - Transcripting voice to a words
+
+[Application link](http://34.148.127.152:8501/)
 [Codelab Documentation]()
 
 ## Objective

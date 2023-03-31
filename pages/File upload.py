@@ -83,9 +83,16 @@ def check_file_exists(file_name):
 if st.button("Ask"):
     
     with st.spinner("Processing your request"):
+        timeout=120
+        start_time = time.time()
         while not(check_file_exists(file_selected)):
+            elapsed_time = time.time() - start_time
+            if elapsed_time > timeout:
+                st.error("File not processed yet. Please try again later")
+                break                
             time.sleep(5)
-        st.write('file processed')
+            
+        # st.write('file processed')
     
     if qn_selected == "Custom":
         if len(custom_qn) == 0:

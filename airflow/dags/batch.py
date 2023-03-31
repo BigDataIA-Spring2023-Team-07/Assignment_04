@@ -223,7 +223,7 @@ def save_message_history(message_history,filename):
 
     json_file_name = filename.split('.')[0] + '.json'
 
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
+    s3 = create_connection()
     folder_name = 'Message_History'
     s3.put_object(Bucket=bucket_name, Key=f'{folder_name}/{json_file_name}', Body=json_string)
 

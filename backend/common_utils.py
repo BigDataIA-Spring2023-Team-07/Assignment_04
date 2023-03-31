@@ -44,3 +44,12 @@ def trigger_dag(filename):
     }
     response = requests.post(AIRFLOW_API_ENDPOINT, json=data, auth=(airflow_username, airflow_password))
     return response
+
+def dag_status():
+
+    """checks DAG status
+    Args:
+        filename (str): Name of the file
+    """
+    response = requests.get(AIRFLOW_API_ENDPOINT, auth=(airflow_username, airflow_password))
+    return response

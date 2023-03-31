@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 import boto3
 import os
@@ -12,9 +13,9 @@ import json
 load_dotenv()
 
 
-st.title("Model as a Service - Meeting Summary :page_with_curl:")
+st.title("VaniVerse - Transcribing voice to words :page_with_curl:")
 
-st.header("Please upload the audio file :mega:")
+st.header("Select audio file to upload")
 
 audio_file = st.file_uploader("Upload audio file (Limit 25Mb)", type=['mp4', 'mp3', 'wav'])
 
@@ -69,7 +70,23 @@ if qn_selected == "Custom":
 message_history = []
 message_history.append({"role": "user", "content": f"{custom_qn}"})
 
+def check_file_exists(file_name):
+    s3client = common_utils.create_connection()
+    bucket = os.environ.get('bucket_name')
+    prefix = 'Message_History/'
+    response = s3client.list_objects_v2(Bucket=bucket, Prefix=prefix+file_name+'.json')
+    if 'Contents' in response:
+        return True
+    else:
+        return False
+
 if st.button("Ask"):
+    
+    with st.spinner("Processing your request"):
+        while not(check_file_exists(file_selected)):
+            time.sleep(5)
+        st.write('file processed')
+    
     if qn_selected == "Custom":
         if len(custom_qn) == 0:
             st.error("Please enter a question")
@@ -85,6 +102,7 @@ if st.button("Ask"):
                     bucket = os.environ.get('bucket_name')
                     prefix = 'Message_History/'
                     response = s3client.list_objects_v2(Bucket=bucket, Prefix=prefix+file_selected+'.json')
+                    
                     for obj in response['Contents']:
                         file_obj = s3client.get_object(Bucket=bucket, Key=obj['Key'])
                         file_content = file_obj['Body'].read().decode('utf-8')
@@ -99,13 +117,11 @@ if st.button("Ask"):
                             "Type": "Custom"
                         }
                         data['message_history'].append(new_item)
-
-                        # Encode the modified JSON content
-                        new_content = json.dumps(data).encode('utf-8')
-                        print(new_content)
+                        new_content = json.dumps(data)
 
                         # Upload the modified file back to S3
-                        s3client.put_object(Bucket=bucket, Key= obj['Key'], Body=new_content)
+                    s3client.delete_object(Bucket=bucket, Key=prefix+file_selected+'.json')    
+                    s3client.put_object(Bucket=bucket, Key= obj['Key'], Body=new_content)
     else:
         s3client = common_utils.create_connection()        
         response = s3client.get_object(Bucket=os.environ.get('bucket_name'), Key= 'Message_History/' + file_selected+'.json')

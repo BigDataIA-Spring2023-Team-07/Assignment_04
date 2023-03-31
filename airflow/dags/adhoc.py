@@ -205,16 +205,8 @@ def save_message_history(message_history,filename):
 
     json_file_name = filename.split('.')[0] + '.json'
 
-    s3 = boto3.client('s3', aws_access_key_id=aws_access_key, aws_secret_access_key=aws_secret_key)
+    s3 = create_connection()
     folder_name = 'Message_History'
-
-    # logger.info("11111111111")
-    # logger.info(bucket_name)
-    # logger.info(folder_name)
-    # logger.info(json_file_name)
-    # logger.info(json_string)
-    # logger.info("11111111111")
-    
     s3.put_object(Bucket=bucket_name, Key=f'{folder_name}/{json_file_name}', Body=json_string)
 
 def getdefaultquestion(question, transcript, message_history):
@@ -240,7 +232,7 @@ def getdefaultquestion(question, transcript, message_history):
         return reply, message_history
 
 
-# Task 4: passes the transcript to GPT 3.5 Turbo model for processing
+# Task 4: passes the transcript to GPT 3.5 Turbo model for processing..
 def process_transcript(**context):
 
     transcript = context['task_instance'].xcom_pull(task_ids='transcribe_audio', key='transcription')
@@ -258,25 +250,6 @@ def process_transcript(**context):
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
 
-    # # Define the transcript and content of each question
-    # message = [
-    #     {"role": "user", "content": f"This is the meeting transcript.{transcript}"},
-    #     {"role": "user", "content": "Can you summarize the meeting for me?"},
-    #     {"role": "user", "content": "What was the main topic discussed in the meeting?"},
-    #     {"role": "user", "content": "How was the tone of the meeting?"},
-    #     {"role": "user", "content": "Are there any action items from the meeting that we need to follow up on?"},
-    # ]
-
-    # # Generate a chat response using the OpenAI API
-    # completion = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=message
-    # )
-
-    # # Grab just the text from the API completion response
-    # reply_content = completion.choices[0].message.content
-
-
     #Save message history to S3
     filename = context["dag_run"].conf["filename"]
     save_message_history(message_history,filename)
@@ -285,18 +258,7 @@ def process_transcript(**context):
     context['task_instance'].xcom_push(key='transcript', value=transcript)
     context['task_instance'].xcom_push(key='message_history', value=message_history)
 
-    
 
-# def send_to_streamlit(**context):
-#     transcript = context['task_instance'].xcom_pull(task_ids='transcribe_audio', key='transcription')
-#     context['task_instance'].xcom_push(key='transcript', value=transcript)
-#     # requests.post('http://localhost:8501/transcript', data=transcript)
-#     # url = 'http://34.148.127.152:8501/File_Upload'
-
-#     # # url = "http://localhost:8501/get_transcript"
-#     # data = {"transcript_id": "123"}
-
-#     # response = requests.post(url, data=data)
 
 
 # Defining the DAG

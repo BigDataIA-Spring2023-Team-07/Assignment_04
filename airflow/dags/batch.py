@@ -199,7 +199,7 @@ def chat(inp, message_history, role="user"):
     # Grab just the text from the API completion response
     reply_content = completion.choices[0].message.content
 
-    # Append the generated response to the message history
+    # Append the generated response to the message history.
     message_history.append({"role": "assistant", "content": f"{reply_content}"})
 
     # Return the generated response

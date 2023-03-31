@@ -1,6 +1,6 @@
 <img src="logo.png" width=200>
 
-# VaniVerse - Transcripting voice to a words
+# VaniVerse - Transcribing voice to a words
 
 VaniVerse is a conversational AI platform that can be used to generate prompts for a given audio file. "Vani" is a Sanskrit word which means "speech" and 
 "Verse" means world/collection. Currently hosted on GCP
@@ -34,7 +34,7 @@ We developed an AI powered tool which leverages combination of OPENAI Whisper an
 ## Video 
 
 <div align="center">
-  <a href=""><img src="" alt="VaniVerse Demo"></a>
+  <a href="https://www.youtube.com/watch?v=_2sAEgjwvAo"><img src="videocover.png" alt="VaniVerse Demo"></a>
 </div>
 
 ## Steps to reproduce

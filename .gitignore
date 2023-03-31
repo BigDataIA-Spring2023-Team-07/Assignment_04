@@ -10,3 +10,8 @@ venv_a4
 .DS_Store
 backend/whisper.py
 airflow/logs
+lex_ai_sam_altman.mp3
+lex_ai_sam_altman_5min.mp3
+airflow/working_dir/WhatsApp Audio 2023-03-31 at 12.49.06_English.mp4
+airflow/working_dir/lex_ai_sam_altman_5min_English.mp3
+airflow/db_data

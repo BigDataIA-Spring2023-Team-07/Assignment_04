@@ -12,7 +12,14 @@ from pydub import AudioSegment
 import json
 from pathlib import Path
 import os
-import logger
+import logging
+
+
+# create a logger object
+logger = logging.getLogger()
+
+# set the log level to INFO
+logger.setLevel(logging.INFO)
 
 aws_access_key = Variable.get('AWS_ACCESS_KEY')
 aws_secret_key = Variable.get('AWS_SECRET_KEY')
@@ -113,7 +120,7 @@ def break_up_file_to_chunks(text, chunk_size=2000, overlap=100):
     
     return chunks
 
-def split_token_chat(text, question):
+def split_token_chat(text, question,message_history):
 
     """Split the text into chunks and call the chatgpt api
     Args:
@@ -146,6 +153,8 @@ def split_token_chat(text, question):
 
     prompt_request = "Can you consoloidate this text ?" + str(prompt_response)
 
+    message_history.append({"role": "user", "content": f"{text + question}"})
+
     response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt_request,
@@ -156,7 +165,8 @@ def split_token_chat(text, question):
             presence_penalty=0)
 
     meeting_summary = response["choices"][0]["text"].strip()
-    return meeting_summary, messages
+    message_history.append({"role": "assistant", "content": f"{meeting_summary}"})
+    return meeting_summary, message_history
 
 def chat(inp, message_history, role="user"):
 
@@ -203,7 +213,7 @@ def save_message_history(message_history,filename):
     final_json['message_history'] = my_list
     json_string = json.dumps(final_json)
 
-    json_file_name = filename.split('.')[0] + '.json'
+    json_file_name = filename[:-4] + '.json'
 
     s3 = create_connection()
     folder_name = 'Message_History'
@@ -224,15 +234,20 @@ def getdefaultquestion(question, transcript, message_history):
     file_content = transcript
 
     num_tokens = count_tokens(file_content)
+    
     if num_tokens > 2000:
-        reply, message_history = split_token_chat(file_content, question)
+        reply, message_history = split_token_chat(file_content, question,message_history)
+        logger.info(f"Reply >2000: {reply}")
+        logger.info(f"Message History > 2000: {message_history}")
         return reply, message_history
     else:
         reply, message_history = chat(file_content + question, message_history)
+        logger.info(f"Reply: {reply}")
+        logger.info(f"Message History: {message_history}")
         return reply, message_history
 
 
-# Task 4: passes the transcript to GPT 3.5 Turbo model for processing..
+# Task 4: passes the transcript to GPT 3.5 Turbo model for processing.
 def process_transcript(**context):
 
     transcript = context['task_instance'].xcom_pull(task_ids='transcribe_audio', key='transcription')
@@ -241,7 +256,7 @@ def process_transcript(**context):
     question = "Can you summarize?"
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
-
+    
     question = "What is the main topic?"
     # message_history.append({"role": "user", "content": f"{question}"})
     getdefaultquestion(question,transcript,message_history)
@@ -252,6 +267,8 @@ def process_transcript(**context):
 
     #Save message history to S3
     filename = context["dag_run"].conf["filename"]
+    logger.info('filename: %s', filename)
+    logger.info('message_history: %s', message_history)
     save_message_history(message_history,filename)
 
     # Push the generated response

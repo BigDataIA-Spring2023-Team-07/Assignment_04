@@ -36,7 +36,7 @@ def getfilenames():
         if file_name != '':
             file_list.append(file_name)
 
-    file_list = [val.split(".")[0] for val in file_list]
+    file_list = [val[:-4] for val in file_list]
     # file_list.remove('Adhoc/')
     # file_list.remove('Batch/')
 
@@ -105,7 +105,7 @@ def getdefaultquestion(question, selected_file, message_history):
         if file_name != '':
             file_list.append(file_name)
 
-    file_list = [val.split(".")[0] for val in file_list]
+    file_list = [val[:-4] for val in file_list]
 
     # print(selected_file, file_list)
 

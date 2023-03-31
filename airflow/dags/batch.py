@@ -131,7 +131,7 @@ def break_up_file_to_chunks(text, chunk_size=2000, overlap=100):
     
     return chunks
 
-def split_token_chat(text, question):
+def split_token_chat(text, question,message_history):
 
     """Split the text into chunks and call the chatgpt api
     Args:
@@ -164,6 +164,8 @@ def split_token_chat(text, question):
 
     prompt_request = "Can you consoloidate this text ?" + str(prompt_response)
 
+    message_history.append({"role": "user", "content": f"{text + question}"})
+
     response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt_request,
@@ -174,7 +176,8 @@ def split_token_chat(text, question):
             presence_penalty=0)
 
     meeting_summary = response["choices"][0]["text"].strip()
-    return meeting_summary, messages
+    message_history.append({"role": "assistant", "content": f"{meeting_summary}"})
+    return meeting_summary, message_history
 
 def chat(inp, message_history, role="user"):
 
@@ -243,7 +246,7 @@ def getdefaultquestion(question, transcript, message_history):
 
     num_tokens = count_tokens(file_content)
     if num_tokens > 2000:
-        reply, message_history = split_token_chat(file_content, question)
+        reply, message_history = split_token_chat(file_content, question, message_history)
         return reply, message_history
     else:
         reply, message_history = chat(file_content + question, message_history)

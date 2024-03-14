@@ -6,8 +6,6 @@ VaniVerse is a conversational AI platform that can be used to generate prompts f
 "Verse" means world/collection. Currently hosted on GCP
 
 ## Resources
-
-- [Application link](http://34.148.127.152:8501/) <br>
 - [Codelab Documentation](https://codelabs-preview.appspot.com/?file_id=1hNtIBuVUguJAEm5IxnkI41rLJiBsVWwF6RFALK7FtU0#0)
 
 ## What is VaniVerse?
